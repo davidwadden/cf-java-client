@@ -46,7 +46,7 @@ abstract class _OneTimePasscodeTokenProvider extends AbstractUaaTokenProvider {
     }
 
     @Override
-    public String getUserIdentityProperty() {
+    public String getIdentityJwtClaimName() {
         return "client_id";
     }
 }

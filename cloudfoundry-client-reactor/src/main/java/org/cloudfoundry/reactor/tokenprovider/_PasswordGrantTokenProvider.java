@@ -60,7 +60,7 @@ abstract class _PasswordGrantTokenProvider extends AbstractUaaTokenProvider {
     }
 
     @Override
-    public String getUserIdentityProperty() {
+    public String getIdentityJwtClaimName() {
         return "user_name";
     }
 }

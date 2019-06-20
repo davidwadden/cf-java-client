@@ -41,7 +41,7 @@ abstract class _ClientCredentialsGrantTokenProvider extends AbstractUaaTokenProv
     }
 
     @Override
-    public String getUserIdentityProperty() {
+    public String getIdentityJwtClaimName() {
         return "client_id";
     }
 }

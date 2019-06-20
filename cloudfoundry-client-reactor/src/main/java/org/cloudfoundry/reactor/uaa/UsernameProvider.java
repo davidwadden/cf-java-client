@@ -73,7 +73,7 @@ final class UsernameProvider {
             .parseClaimsJws(token);
 
         return Optional
-            .ofNullable(jws.getBody().get(this.tokenProvider.getUserIdentityProperty(), String.class))
+            .ofNullable(jws.getBody().get(this.tokenProvider.getIdentityJwtClaimName(), String.class))
             .orElseThrow(() -> new IllegalStateException("Unable to retrieve username from token"));
     }
 

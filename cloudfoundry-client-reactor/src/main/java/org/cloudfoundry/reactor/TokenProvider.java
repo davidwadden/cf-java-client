@@ -45,7 +45,7 @@ public interface TokenProvider {
      *
      * @return
      */
-    default String getUserIdentityProperty() {
+    default String getIdentityJwtClaimName() {
         return "user_name";
     }
 }

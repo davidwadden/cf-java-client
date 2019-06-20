@@ -61,7 +61,7 @@ public final class UsernameProviderTest {
         String invalidToken = String.format("bearer %s", getToken(keyPair.getPrivate(), Instant.now().minus(Duration.ofHours(1))));
         String validToken = String.format("bearer %s", getToken(keyPair.getPrivate(), Instant.now().plus(Duration.ofHours(1))));
         when(this.tokenProvider.getToken(this.connectionContext)).thenReturn(Mono.just(invalidToken), Mono.just(validToken));
-        when(this.tokenProvider.getUserIdentityProperty()).thenReturn("user_name");
+        when(this.tokenProvider.getIdentityJwtClaimName()).thenReturn("user_name");
 
         this.usernameProvider
             .get()
@@ -80,7 +80,7 @@ public final class UsernameProviderTest {
 
         String token = String.format("bearer %s", getToken(keyPair.getPrivate(), Instant.now().plus(Duration.ofHours(1))));
         when(this.tokenProvider.getToken(this.connectionContext)).thenReturn(Mono.just(token));
-        when(this.tokenProvider.getUserIdentityProperty()).thenReturn("user_name");
+        when(this.tokenProvider.getIdentityJwtClaimName()).thenReturn("user_name");
 
         this.usernameProvider
             .get()
@@ -97,7 +97,7 @@ public final class UsernameProviderTest {
 
         String token = String.format("bearer %s", getToken(keyPair.getPrivate(), Instant.now().plus(Duration.ofHours(1))));
         when(this.tokenProvider.getToken(this.connectionContext)).thenReturn(Mono.just(token));
-        when(this.tokenProvider.getUserIdentityProperty()).thenReturn("client_id");
+        when(this.tokenProvider.getIdentityJwtClaimName()).thenReturn("client_id");
 
         this.usernameProvider
             .get()
