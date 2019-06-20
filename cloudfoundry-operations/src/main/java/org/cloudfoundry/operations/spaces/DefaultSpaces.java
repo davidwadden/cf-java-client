@@ -21,6 +21,8 @@ import org.cloudfoundry.client.v2.Resource;
 import org.cloudfoundry.client.v2.applications.ApplicationResource;
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationUserByUsernameRequest;
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationUserByUsernameResponse;
+import org.cloudfoundry.client.v2.organizations.AssociateOrganizationUserRequest;
+import org.cloudfoundry.client.v2.organizations.AssociateOrganizationUserResponse;
 import org.cloudfoundry.client.v2.organizations.GetOrganizationRequest;
 import org.cloudfoundry.client.v2.organizations.GetOrganizationResponse;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationPrivateDomainsRequest;
@@ -39,10 +41,18 @@ import org.cloudfoundry.client.v2.spacequotadefinitions.GetSpaceQuotaDefinitionR
 import org.cloudfoundry.client.v2.spacequotadefinitions.GetSpaceQuotaDefinitionResponse;
 import org.cloudfoundry.client.v2.spacequotadefinitions.SpaceQuotaDefinitionEntity;
 import org.cloudfoundry.client.v2.spacequotadefinitions.SpaceQuotaDefinitionResource;
+import org.cloudfoundry.client.v2.spaces.AssociateSpaceAuditorByUsernameRequest;
+import org.cloudfoundry.client.v2.spaces.AssociateSpaceAuditorByUsernameResponse;
+import org.cloudfoundry.client.v2.spaces.AssociateSpaceAuditorRequest;
+import org.cloudfoundry.client.v2.spaces.AssociateSpaceAuditorResponse;
 import org.cloudfoundry.client.v2.spaces.AssociateSpaceDeveloperByUsernameRequest;
 import org.cloudfoundry.client.v2.spaces.AssociateSpaceDeveloperByUsernameResponse;
+import org.cloudfoundry.client.v2.spaces.AssociateSpaceDeveloperRequest;
+import org.cloudfoundry.client.v2.spaces.AssociateSpaceDeveloperResponse;
 import org.cloudfoundry.client.v2.spaces.AssociateSpaceManagerByUsernameRequest;
 import org.cloudfoundry.client.v2.spaces.AssociateSpaceManagerByUsernameResponse;
+import org.cloudfoundry.client.v2.spaces.AssociateSpaceManagerRequest;
+import org.cloudfoundry.client.v2.spaces.AssociateSpaceManagerResponse;
 import org.cloudfoundry.client.v2.spaces.CreateSpaceResponse;
 import org.cloudfoundry.client.v2.spaces.DeleteSpaceResponse;
 import org.cloudfoundry.client.v2.spaces.ListSpaceApplicationsRequest;
@@ -121,10 +131,10 @@ public final class DefaultSpaces implements Spaces {
                     .map(ResourceUtils::getId),
                 Mono.just(username)
             )))
-            .delayUntil(function((cloudFoundryClient, organizationId, spaceId, username) -> requestAssociateOrganizationUserByUsername(cloudFoundryClient, organizationId, username)))
+            .delayUntil(function((cloudFoundryClient, organizationId, spaceId, username) -> requestAssociateOrganizationUser(cloudFoundryClient, organizationId, username)))
             .flatMap(function((cloudFoundryClient, organizationId, spaceId, username) -> Mono.zip(
-                requestAssociateSpaceManagerByUsername(cloudFoundryClient, spaceId, username),
-                requestAssociateSpaceDeveloperByUsername(cloudFoundryClient, spaceId, username)
+                requestAssociateSpaceManager(cloudFoundryClient, spaceId, username),
+                requestAssociateSpaceDeveloper(cloudFoundryClient, spaceId, username)
             )))
             .then()
             .transform(OperationsLogging.log("Create Space"))
@@ -329,6 +339,14 @@ public final class DefaultSpaces implements Spaces {
             .onErrorResume(NoSuchElementException.class, t -> ExceptionUtils.illegalArgument("Space quota definition %s does not exist", spaceQuota));
     }
 
+    private static Mono<AssociateOrganizationUserResponse> requestAssociateOrganizationUser(CloudFoundryClient cloudFoundryClient, String organizationId, String uaaId) {
+        return cloudFoundryClient.organizations()
+            .associateUser(AssociateOrganizationUserRequest.builder()
+                .organizationId(organizationId)
+                .userId(uaaId)
+                .build());
+    }
+
     private static Mono<AssociateOrganizationUserByUsernameResponse> requestAssociateOrganizationUserByUsername(CloudFoundryClient cloudFoundryClient, String organizationId, String username) {
         return cloudFoundryClient.organizations()
             .associateUserByUsername(AssociateOrganizationUserByUsernameRequest.builder()
@@ -337,11 +355,43 @@ public final class DefaultSpaces implements Spaces {
                 .build());
     }
 
+    private static Mono<AssociateSpaceAuditorResponse> requestAssociateSpaceAuditor(CloudFoundryClient cloudFoundryClient, String spaceId, String uaaId) {
+        return cloudFoundryClient.spaces()
+            .associateAuditor(AssociateSpaceAuditorRequest.builder()
+                .spaceId(spaceId)
+                .auditorId(uaaId)
+                .build());
+    }
+
+    private static Mono<AssociateSpaceAuditorByUsernameResponse> requestAssociateSpaceAuditorByUsername(CloudFoundryClient cloudFoundryClient, String spaceId, String username) {
+        return cloudFoundryClient.spaces()
+            .associateAuditorByUsername(AssociateSpaceAuditorByUsernameRequest.builder()
+                .spaceId(spaceId)
+                .username(username)
+                .build());
+    }
+
+    private static Mono<AssociateSpaceDeveloperResponse> requestAssociateSpaceDeveloper(CloudFoundryClient cloudFoundryClient, String spaceId, String uaaId) {
+        return cloudFoundryClient.spaces()
+            .associateDeveloper(AssociateSpaceDeveloperRequest.builder()
+                .spaceId(spaceId)
+                .developerId(uaaId)
+                .build());
+    }
+
     private static Mono<AssociateSpaceDeveloperByUsernameResponse> requestAssociateSpaceDeveloperByUsername(CloudFoundryClient cloudFoundryClient, String spaceId, String username) {
         return cloudFoundryClient.spaces()
             .associateDeveloperByUsername(AssociateSpaceDeveloperByUsernameRequest.builder()
                 .spaceId(spaceId)
                 .username(username)
+                .build());
+    }
+
+    private static Mono<AssociateSpaceManagerResponse> requestAssociateSpaceManager(CloudFoundryClient cloudFoundryClient, String spaceId, String uaaId) {
+        return cloudFoundryClient.spaces()
+            .associateManager(AssociateSpaceManagerRequest.builder()
+                .spaceId(spaceId)
+                .managerId(uaaId)
                 .build());
     }
 

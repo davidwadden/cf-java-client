@@ -25,8 +25,12 @@ import org.cloudfoundry.client.v2.organizationquotadefinitions.ListOrganizationQ
 import org.cloudfoundry.client.v2.organizationquotadefinitions.OrganizationQuotaDefinitionResource;
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationManagerByUsernameRequest;
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationManagerByUsernameResponse;
+import org.cloudfoundry.client.v2.organizations.AssociateOrganizationManagerRequest;
+import org.cloudfoundry.client.v2.organizations.AssociateOrganizationManagerResponse;
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationUserByUsernameRequest;
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationUserByUsernameResponse;
+import org.cloudfoundry.client.v2.organizations.AssociateOrganizationUserRequest;
+import org.cloudfoundry.client.v2.organizations.AssociateOrganizationUserResponse;
 import org.cloudfoundry.client.v2.organizations.CreateOrganizationResponse;
 import org.cloudfoundry.client.v2.organizations.DeleteOrganizationResponse;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationPrivateDomainsRequest;
@@ -218,11 +222,27 @@ public final class DefaultOrganizations implements Organizations {
             .collectList();
     }
 
+    private static Mono<AssociateOrganizationManagerResponse> requestAssociateOrganizationManager(CloudFoundryClient cloudFoundryClient, String organizationId, String uaaId) {
+        return cloudFoundryClient.organizations()
+            .associateManager(AssociateOrganizationManagerRequest.builder()
+                .organizationId(organizationId)
+                .managerId(uaaId)
+                .build());
+    }
+
     private static Mono<AssociateOrganizationManagerByUsernameResponse> requestAssociateOrganizationManagerByUsername(CloudFoundryClient cloudFoundryClient, String organizationId, String username) {
         return cloudFoundryClient.organizations()
             .associateManagerByUsername(AssociateOrganizationManagerByUsernameRequest.builder()
                 .organizationId(organizationId)
                 .username(username)
+                .build());
+    }
+
+    private static Mono<AssociateOrganizationUserResponse> requestAssociateOrganizationUser(CloudFoundryClient cloudFoundryClient, String organizationId, String uaaId) {
+        return cloudFoundryClient.organizations()
+            .associateUser(AssociateOrganizationUserRequest.builder()
+                .organizationId(organizationId)
+                .userId(uaaId)
                 .build());
     }
 
@@ -334,7 +354,16 @@ public final class DefaultOrganizations implements Organizations {
                 .build());
     }
 
-    private static Mono<Void> setOrganizationManager(CloudFoundryClient cloudFoundryClient, String organizationId, String username) {
+    private static Mono<Void> setOrganizationManager(CloudFoundryClient cloudFoundryClient, String organizationId, String uaaId) {
+        return Mono
+            .zip(
+                requestAssociateOrganizationManager(cloudFoundryClient, organizationId, uaaId),
+                requestAssociateOrganizationUser(cloudFoundryClient, organizationId, uaaId)
+            )
+            .then();
+    }
+
+    private static Mono<Void> setOrganizationManagerByUsername(CloudFoundryClient cloudFoundryClient, String organizationId, String username) {
         return Mono
             .zip(
                 requestAssociateOrganizationManagerByUsername(cloudFoundryClient, organizationId, username),
