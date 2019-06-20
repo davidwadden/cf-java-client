@@ -42,10 +42,10 @@ public interface TokenProvider {
 
     /**
      * Provides the name of the property in jwt which is effective for user identity (i.e. client_id for ClientCredentialsTokenProvider and user_name for PasswordGrantTokenProvider)
-     * 
+     *
      * @return
      */
-    default String getUserIdentityProperty(){
-    	return "user_name";
+    default String getUserIdentityProperty() {
+        return "user_name";
     }
 }

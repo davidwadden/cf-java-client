@@ -62,7 +62,7 @@ public final class UsernameProviderTest {
         String validToken = String.format("bearer %s", getToken(keyPair.getPrivate(), Instant.now().plus(Duration.ofHours(1))));
         when(this.tokenProvider.getToken(this.connectionContext)).thenReturn(Mono.just(invalidToken), Mono.just(validToken));
         when(this.tokenProvider.getUserIdentityProperty()).thenReturn("user_name");
-        
+
         this.usernameProvider
             .get()
             .as(StepVerifier::create)
@@ -81,7 +81,7 @@ public final class UsernameProviderTest {
         String token = String.format("bearer %s", getToken(keyPair.getPrivate(), Instant.now().plus(Duration.ofHours(1))));
         when(this.tokenProvider.getToken(this.connectionContext)).thenReturn(Mono.just(token));
         when(this.tokenProvider.getUserIdentityProperty()).thenReturn("user_name");
-        
+
         this.usernameProvider
             .get()
             .as(StepVerifier::create)
@@ -89,7 +89,7 @@ public final class UsernameProviderTest {
             .expectComplete()
             .verify(Duration.ofSeconds(1));
     }
-    
+
     @Test
     public void getValidTokenWithClient() throws NoSuchAlgorithmException {
         KeyPair keyPair = getKeyPair();
@@ -98,7 +98,7 @@ public final class UsernameProviderTest {
         String token = String.format("bearer %s", getToken(keyPair.getPrivate(), Instant.now().plus(Duration.ofHours(1))));
         when(this.tokenProvider.getToken(this.connectionContext)).thenReturn(Mono.just(token));
         when(this.tokenProvider.getUserIdentityProperty()).thenReturn("client_id");
-        
+
         this.usernameProvider
             .get()
             .as(StepVerifier::create)

@@ -59,8 +59,8 @@ abstract class _PasswordGrantTokenProvider extends AbstractUaaTokenProvider {
                 .then());
     }
 
-	@Override
-	String getIdentityZoneSubdomain() {
-		return "user_name";
-	}
+    @Override
+    public String getUserIdentityProperty() {
+        return "user_name";
+    }
 }
